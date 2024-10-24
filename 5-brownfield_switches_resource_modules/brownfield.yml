@@ -1,0 +1,73 @@
+---
+- name: Gather configuration information from network devices
+  hosts: switches
+  gather_facts: false
+
+  tasks:
+    
+    - name: Retrieve a repository from a distant location and make it available to the local EE
+      ansible.scm.git_retrieve:
+        origin:
+          url: "http://gitea:gitea@ansible-1:3000/gitea/network-demos-repo.git"
+        parent_directory: /tmp
+        branch:
+            name: master
+            duplicate_detection: no  
+      run_once: true
+      register: repository
+      delegate_to: localhost
+
+    - name: Gather network information
+      cisco.nxos.nxos_facts:
+        gather_network_resources:
+          - static_routes
+          - ntp_global
+          - logging_global
+          - hostname
+          - snmp_server
+          - vlans
+          - interfaces
+          - l2_interfaces
+          - l3_interfaces
+          - acl_interfaces
+          - acls
+          - bfd_interfaces
+          - hsrp_interfaces
+          - lacp
+          - lacp_interfaces
+          - lag_interfaces 
+          - lldp_global
+          - lldp_interfaces
+          - ospf_interfaces
+          - ospfv2
+          - ospfv3
+          - prefix_lists
+          - route_maps
+          - telemetry
+        gather_subset:
+          - '!min'
+          - '!all'
+
+    - name: Create a host_vars directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ repository['path'] }}/network_brownfield_resource_modules/host_vars/{{ inventory_hostname }}/"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+
+    - name: Add network facts to the host_vars
+      ansible.builtin.copy:
+        content: "{{ ansible_network_resources | to_nice_yaml }}"
+        dest: "{{ repository['path'] }}/network_brownfield_resource_modules/host_vars/{{ inventory_hostname }}/brownfield.yaml"
+      delegate_to: localhost
+
+    - name: Publish the changes
+      ansible.scm.git_publish:
+        path: "{{ repository['path'] }}"
+        token: "{{ password }}"
+        user:
+          name: "{{ username }}"
+          email: "{{ email }}"
+      delegate_to: localhost
+    
+      

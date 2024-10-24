@@ -1,0 +1,71 @@
+---
+- name: Validate the Environment for a New Router
+  hosts: arista
+  gather_facts: false
+  vars:
+   dest: 192.168.2.2
+
+  tasks:
+   - name:  Verify connectivity to attached router
+     block: 
+   
+        - name: Check Route Table for {{ inventory_hostname }}
+          arista.eos.eos_command:
+             commands: ping {{ dest }}
+          register: arista_ping
+          when: inventory_hostname == 'rtr4'
+
+        - name: Print Event Info
+          ansible.builtin.debug:
+            msg:  
+            - "{{ dest }}"
+            - "{{ arista_ping['stdout_lines'][0]}}"
+          when: inventory_hostname == 'rtr4'
+        
+        - name: Assert the ping can reach the loopback at {{ dest }}
+          ansible.builtin.assert:
+            that: "'100% packet loss' not in arista_ping['stdout'][0]"
+            fail_msg: "The ping to {{ dest }} failed"
+            success_msg: "The ping  to {{ dest }} passed"
+          retries: 3
+          delay: 10
+          when: inventory_hostname == 'rtr4'
+
+     rescue:
+
+        - name: Check Route Table for {{ inventory_hostname }}
+          arista.eos.eos_command:
+            commands: show ip route {{ dest }}
+          register: arista_route
+          when: inventory_hostname == 'rtr4'
+
+        - name: Print Event Info
+          ansible.builtin.debug:
+            msg:  
+            - "{{ dest }}"
+            - "{{ arista_route['stdout_lines'][0]}}"
+          when: inventory_hostname == 'rtr4'
+        
+        - name: Assert {{ dest }} is advertised by OSPF
+          ansible.builtin.assert:
+            that: "'Gateway of last resort' not in arista_route['stdout'][0]"
+            fail_msg: "The {{ dest }} route is blackholed to the defaut gateway!"
+            success_msg: "The {{ dest }} route is adverstised by OSPF"
+          retries: 3
+          delay: 10
+          when: inventory_hostname == 'rtr4'
+
+     always:
+    
+        - name: Check Route Config for {{ inventory_hostname }}
+          arista.eos.eos_command:
+            commands: show run | s ospf 
+          register: arista_ospf
+          when: inventory_hostname in groups['arista']
+
+        - name: Print config
+          ansible.builtin.debug:
+            msg:  
+            - "{{ arista_ospf['stdout_lines'][0]}}"
+          when: inventory_hostname in groups['arista']
+    

@@ -1,0 +1,11 @@
+logging_global:
+    console:
+        any:
+            level: critical
+    hosts:
+    -   any:
+            level: warning
+        name: 1.1.1.2
+    -   any:
+            level: warning
+        name: 1.1.1.3

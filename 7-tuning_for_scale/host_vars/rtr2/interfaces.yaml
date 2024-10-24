@@ -1,0 +1,15 @@
+interfaces:
+-   enabled: true
+    mode: layer3
+    name: Ethernet1
+-   enabled: true
+    mode: layer3
+    name: Ethernet100
+-   enabled: true
+    name: Loopback0
+    description: Arista
+-   enabled: true
+    mtu: 1394
+    name: Tunnel0
+-   enabled: true
+    name: Tunnel1

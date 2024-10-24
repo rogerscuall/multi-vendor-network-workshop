@@ -1,0 +1,29 @@
+<!-- INTERNAL TABLE FOR SNMP -->
+<div id="accordion">
+<div>
+<h3>SNMP</h3>
+<div class="net_content">
+{% if hostvars[network_switch]['ansible_network_resources']['snmp_server'] is defined and hostvars[network_switch]['ansible_network_resources']['snmp_server']|length > 0 %}
+<table id="subtable">
+    <thead>
+        <tr>
+            <th>Community</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for snmp in hostvars[network_switch]['ansible_network_resources']['snmp_server']['communities'] %}
+        <tr>
+            <td>{% if snmp['name'] != desired_snmp %}<mark>{{snmp['name']}}</mark>{% else %}{{snmp['name'] | default('none')}}{% endif %}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% elif hostvars[network_switch]['ansible_network_resources']['snmp_server'] is defined and hostvars[network_switch]['ansible_network_resources']['snmp_server']|length == 0 %}
+SNMP is not configured on this device
+{% else %}
+No SNMP information available
+{% endif %}
+</div>
+</div>
+</div>
+<!-- END INTERNAL TABLE FOR SNMP -->

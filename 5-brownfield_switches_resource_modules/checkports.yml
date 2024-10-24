@@ -1,0 +1,70 @@
+---
+- name: Check Ports
+  hosts: switches
+  gather_facts: false
+
+  tasks:
+    - name: Gather interfaces resources
+      cisco.nxos.nxos_facts:
+        gather_subset:
+          - "!all"
+          - "!min"
+        gather_network_resources:
+          - interfaces
+          - l2_interfaces
+
+    - name: Set Description Filter
+      set_fact:
+        descr: "{{ ansible_facts.network_resources.interfaces | selectattr('description', 'defined') }}"
+
+    - name: list_descriptions
+      ansible.builtin.debug:
+        msg:
+          - "host_name: {{ inventory_hostname }}"
+          - "interfaces with the description 'trunk port':{{ descr | selectattr('description', 'equalto', 'trunk port') | map(attribute='name') }}"
+          - "interfaces with the description 'access port':{{ descr | selectattr('description', 'equalto', 'access port') | map(attribute='name') }}"
+
+    - name: Set Trunk Filter
+      set_fact:
+        native: "{{ ansible_facts.network_resources.l2_interfaces | selectattr('trunk.native_vlan', 'defined')}}"
+
+    - name: List the trunk ports based on native vlan match
+      ansible.builtin.debug:
+        msg:
+          - "host_name: {{ inventory_hostname }}"
+          - "trunk mode interfaces with native vlan 199: {{ native | selectattr('trunk.native_vlan', 'equalto', 199) | map(attribute='name') }}"
+      ignore_errors: true
+
+    - name: Set Access Vlan Filter
+      set_fact:
+        access_ports: "{{ ansible_facts.network_resources.l2_interfaces | selectattr('access', 'defined' )}}"
+
+    - name: List the Access ports based on match
+      ansible.builtin.debug:
+        msg:
+          - "host_name: {{ inventory_hostname }}"
+          - "access mode interfaces with native vlan 101: {{ access_ports | selectattr('access.vlan', 'equalto', 101) | map(attribute='name') }}"
+      ignore_errors: true
+
+    - name: Find Port Security for Access Ports
+      cisco.nxos.nxos_command:
+        commands: "sh run int {{ interface_item }} | i 'switchport port-security violation restrict' "
+      loop: "{{ ansible_network_resources.l2_interfaces
+        | selectattr('access', 'defined')
+        | map(attribute='name')
+        | list }}"
+      loop_control:
+        loop_var: interface_item
+      register: port_security
+
+    - name: Set Access Vlan Filter
+      set_fact:
+        port_security_config: "{{ port_security.results
+          | selectattr('stdout', 'search', 'switchport port-security violation restrict')
+          | map(attribute='interface_item') }}"
+
+    - name: print access ports with Port Security enabled
+      ansible.builtin.debug:
+        msg:
+          - "interfaces with port security configured"
+          - "{{ port_security_config }}"

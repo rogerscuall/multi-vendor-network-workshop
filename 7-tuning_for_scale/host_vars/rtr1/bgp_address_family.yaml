@@ -1,0 +1,20 @@
+bgp_address_family:
+    address_family:
+    -   afi: ipv4
+        neighbors:
+        -   activate: true
+            neighbor_address: 10.200.200.2
+        networks:
+        -   address: 10.100.100.0
+            mask: 255.255.255.0
+        -   address: 10.200.200.0
+            mask: 255.255.255.0
+        -   address: 172.16.0.0
+        -   address: 192.168.1.1
+            mask: 255.255.255.255
+        -   address: 192.168.3.3   
+            mask: 255.255.255.255  
+        redistribute:
+        -   ospf:
+                process_id: 1
+    as_number: '65000'

@@ -1,0 +1,34 @@
+---
+- name: Compare Cisco Configs in Gitea in Branches to Running Routers
+  hosts: "{{ _group }}"
+  gather_facts: False
+
+  tasks:
+    - name: Retrieve a repository from a distant location and make it available to the local EE
+      ansible.scm.git_retrieve:
+        origin:
+          url: "http://gitea:gitea@ansible-1:3000/gitea/network-demos-repo.git"
+        parent_directory: /tmp/
+        branch:
+            name: "{{branch_name}}"
+            duplicate_detection: no  
+      delegate_to: "localhost"
+      run_once: true
+
+    - name: Diff against cisco ios configuration
+      cisco.ios.config:
+        intended_config: "{{ lookup('file', '/tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt') }}"
+        diff_against: intended
+      when: inventory_hostname in groups['cisco']
+
+    - name: Diff against arista eos configuration
+      arista.eos.eos_config:
+        intended_config: "{{ lookup('file', '/tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt') }}"
+        diff_against: intended
+      when: inventory_hostname in groups['arista']
+
+    - name: Diff against juniper junos configuration
+      junipernetworks.junos.junos_config:
+        src: /tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt
+        check_commit: true
+      when: inventory_hostname in groups['juniper']

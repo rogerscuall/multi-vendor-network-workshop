@@ -1,0 +1,14 @@
+snmp_server:
+    groups:
+    -   auth_privacy: auth
+        group: V3GROUP
+        read: V3READ
+        version: v3
+        write: V3WRITE
+    hosts:
+    -   host: 1.1.1.1
+        user: V3USER
+        version: 3 auth
+    traps:
+        snmp:
+            authentication: true

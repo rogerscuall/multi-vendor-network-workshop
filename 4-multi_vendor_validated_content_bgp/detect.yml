@@ -1,0 +1,13 @@
+---
+- name: Detect [configuration-drift] from the resource modules
+  hosts: network
+  gather_facts: false
+  tasks:
+    - name: Network BGP
+      ansible.builtin.include_role:
+        name: network.bgp.run
+      vars:
+        operations:
+          - name: detect
+        data_store:
+          local: "{{ playbook_dir }}"

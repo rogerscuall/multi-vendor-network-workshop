@@ -1,0 +1,13 @@
+acls:
+-   acls:
+    -   aces:
+        -   grant: permit
+            sequence: 10
+            source:
+                address: 192.168.35.0
+                wildcard_bits: 0.0.0.255
+        acl_type: standard
+        name: GS_NAT_ACL
+    -   acl_type: extended
+        name: meraki-fqdn-dns
+    afi: ipv4

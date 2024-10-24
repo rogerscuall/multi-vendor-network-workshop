@@ -1,0 +1,20 @@
+file_path: /data/report
+web_host: ansible-1
+web_port: 8088
+# multi key, same value lookup for cisco
+vendor:
+  ios: &my_value 'Cisco'
+  nxos: *my_value
+  iosxr: *my_value
+  junos: "Juniper"
+  eos: "Arista"
+transport:
+  cliconf: "network_cli"
+  netconf: "netconf"
+  httpapi: "httpapi"
+# compliance variables
+desired_ios_version: "17.14.01a"
+desired_eos_version: "4.29.0F-cloud"
+desired_junos_version: "22.3R2.12"
+desired_snmp: "student1"
+desired_logging_host: "192.168.0.1"

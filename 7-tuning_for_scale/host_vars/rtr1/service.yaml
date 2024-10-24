@@ -1,0 +1,17 @@
+service:
+    counters: 0
+    dhcp: true
+    password_encryption: true
+    password_recovery: true
+    private_config_encryption: true
+    prompt: true
+    slave_log: true
+    timestamps:
+    -   datetime_options:
+            msec: true
+        msg: debug
+        timestamp: datetime
+    -   datetime_options:
+            msec: true
+        msg: log
+        timestamp: datetime

@@ -1,0 +1,9 @@
+- name: Gather network device facts
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ role_path }}/tasks/{{ ansible_network_os }}.yml"
+    - "{{ role_path }}/tasks/unsupported_platform.yml"
+
+- name: Display facts
+  ansible.builtin.debug:
+    var: ansible_network_resources

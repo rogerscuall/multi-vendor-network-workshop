@@ -1,0 +1,10 @@
+snmp_server:
+    snmp_v3:
+        usm:
+            local_engine:
+                users:
+                -   authentication_sha:
+                        key: $9$NNdb2Dik.mTDjp0O1yr4aJUk.mfTQn/24ZjqmTQcyreK8xNd4JGreUjHqQz69ApIEvWLdwYvMJGUi.mQFnC0BylKXxduOX7-VY269CuRhleWXNd9AxN
+                    name: V3USER
+                    privacy_aes128:
+                        key: $9$LcXNwYaZUji.LxHqfT3nWLX7s2aZU.fTJZ69AtOBX7NVgoHqmF69goQF69puLx7-YgaJDPTzdbs4aZji9Atu0IKM87dbvM

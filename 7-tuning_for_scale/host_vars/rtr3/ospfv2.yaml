@@ -1,0 +1,7 @@
+ospfv2:
+-   areas:
+    -   area_id: 0.0.0.0
+        interfaces:
+        -   name: gr-0/0/0.0
+        -   name: lo0.0
+            passive: true

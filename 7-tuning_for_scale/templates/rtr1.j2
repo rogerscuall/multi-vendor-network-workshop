@@ -1,0 +1,17 @@
+!
+interface Tunnel0
+ tunnel source GigabitEthernet1
+ ip address {{ rtr1_tu0 }} 255.255.255.0
+ description {{ rtr1_tu0_desc }}
+ ip mtu 1476
+ ip tcp adjust-mss 1360
+ ip ospf 1 area 0
+ tunnel destination {{ hostvars['rtr3'].private_ip }}
+!         
+interface Tunnel1
+ tunnel source GigabitEthernet1
+ ip address {{ rtr1_tu1 }} 255.255.255.0
+ description {{ rtr1_tu1_desc }}
+ ip mtu 1476
+ ip tcp adjust-mss 1360
+ tunnel destination {{ hostvars['rtr2'].ansible_host }}

@@ -1,0 +1,29 @@
+<!-- INTERNAL TABLE FOR OSPF INTERFACES -->
+<div id="accordion">
+<div>
+<h3>OSPF Interfaces</h3>
+<div class="net_content">
+{% if hostvars[network_switch]['ansible_network_resources']['ospf_interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['ospf_interfaces']|length > 0  %}
+<table id="subtable">
+    <thead>
+        <tr>
+            <th>Interface</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for interface in hostvars[network_switch]['ansible_network_resources']['interfaces'] %}
+        <tr>
+            <td>{{interface['name']}}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% elif hostvars[network_switch]['ansible_network_resources']['ospf_interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['ospf_interfaces']|length == 0 %}
+No interfaces configured on this device
+{% else %}
+No OSPF Interface information available
+{% endif %}
+</div>
+</div>
+</div>
+<!-- END INTERNAL TABLE FOR OSPF INTERFACES -->

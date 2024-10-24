@@ -1,0 +1,6 @@
+l2_interfaces:
+-   name: Loopback0
+-   name: Tunnel0
+-   name: Tunnel1
+-   name: VirtualPortGroup0
+-   name: GigabitEthernet1

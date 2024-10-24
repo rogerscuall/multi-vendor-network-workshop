@@ -1,0 +1,69 @@
+---
+- name: Validate the Environment
+  hosts: rtr1
+  gather_facts: false
+  vars:
+   ospf_neighbor: rtr3
+   bgp_neighbor: rtr2
+
+  tasks:
+
+  - name: Check Interface State for {{ inventory_hostname }}
+    ansible.netcommon.cli_command:
+        command: show ip interface br
+    register: int_state
+
+  - name: Print Event Info
+    ansible.builtin.debug:
+      var: int_state.stdout_lines
+
+  - name: Assert that {{ inventory_hostname }} interfaces are UP
+    ansible.builtin.assert:
+      that:
+        - "'down' not in int_state['stdout']"
+      fail_msg: "{{ inventory_hostname }} interfaces are not all up"
+      success_msg: "{{ inventory_hostname }} interfaces are up"
+
+  - name: Show IP OSPF Neighbor
+    cisco.ios.ios_command:
+     commands:
+      - sh ip ospf neighbor
+    register: ospf
+
+  - name: Assert that OSPF neighbor exists
+    ansible.builtin.assert:
+     that: 
+        - "'FULL/' in ospf['stdout'][0]"
+     fail_msg: "OSPF neighbor is not present"
+     success_msg: "The OSPF Neighbor to {{ hostvars[ospf_neighbor].inventory_hostname }} at {{ hostvars[ospf_neighbor].private_ip }} is Full"
+    retries: 3
+    delay: 10
+
+  - name: Show IP BGP Neighbor
+    cisco.ios.ios_command:
+     commands:
+      - sh ip bgp neighbor
+    register: bgp
+
+  - name: Assert that BGP neighbor exists
+    ansible.builtin.assert:
+     that: 
+        - "'Established' in bgp['stdout'][0]"
+     fail_msg: "BGP neighbor is not present"
+     success_msg: "BGP Neighbor to {{ hostvars[bgp_neighbor].inventory_hostname }} at {{ hostvars[bgp_neighbor].private_ip }} is Established"
+    retries: 3
+    delay: 10
+
+  - name: Ping neighbors
+    cisco.ios.ios_ping:
+      dest: "{{ ping_item }}" 
+    register: ping_output
+    loop: 
+      - "{{ hostvars[ospf_neighbor].private_ip }}"
+      - "{{ hostvars[bgp_neighbor].private_ip }}"
+    loop_control:
+        loop_var: ping_item
+
+  - name: Print Ping Output
+    ansible.builtin.debug:
+      msg: "{{ ping_output }}"

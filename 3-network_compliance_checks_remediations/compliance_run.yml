@@ -1,0 +1,32 @@
+---
+- name: Compliance Check for Router settings
+  hosts: "{{ _group }}"
+  gather_facts: false
+  vars:
+    ignore_all_errors: false
+    save: no
+
+  tasks:
+    - name: Run Compliance Roles
+      ansible.builtin.include_role:
+        name: "roles/{{ role_item }}"
+      loop: "{{ tag }}"
+      loop_control:
+        loop_var: role_item
+
+  handlers:
+    - name: NTP compliance violation
+      ansible.builtin.debug:
+        msg:
+          - "NTP config compliance remediated for {{ inventory_hostname }}"
+
+    - name: Logging compliance violation
+      ansible.builtin.debug:
+        msg:
+          - "Logging compliance remediated for {{ inventory_hostname }}"
+
+    - name: SNMP compliance violation
+      ansible.builtin.debug:
+        msg:
+          - "SNMP compliance remediated for {{ inventory_hostname }}"
+

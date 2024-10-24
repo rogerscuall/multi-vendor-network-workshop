@@ -1,0 +1,21 @@
+---
+- name: Restore Configs from Gitea in Branches to Cisco
+  hosts: "{{ _group }}"
+  gather_facts: False
+  vars:
+    ansible_network_cli_ssh_type: paramiko
+    
+  tasks:
+    - name: Clone a Repo to EE
+      ansible.builtin.shell:
+        cmd: "git clone -b {{ scm_branch }} http://gitea:gitea@ansible-1:3000/gitea/network-demos-repo.git"
+        chdir: /tmp/
+      delegate_to: "localhost"
+      run_once: true
+
+    - name: Run Restore Roles
+      ansible.builtin.include_role:
+        name: "roles/{{ role_item }}"
+      loop: "{{ _group }}"
+      loop_control:
+        loop_var: role_item

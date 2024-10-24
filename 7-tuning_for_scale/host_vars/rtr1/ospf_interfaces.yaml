@@ -1,0 +1,11 @@
+ospf_interfaces:
+-   name: Loopback0
+-   address_family:
+    -   afi: ipv4
+        process:
+            area_id: '0'
+            id: 1
+    name: Tunnel0
+-   name: Tunnel1
+-   name: VirtualPortGroup0
+-   name: GigabitEthernet1

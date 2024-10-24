@@ -1,0 +1,35 @@
+---
+- name: enable scp
+  cisco.ios.ios_config:
+    lines: ip scp server enable
+    save_when: always
+  when: inventory_hostname in groups['cisco']
+    
+- name: copy file to cisco
+  ansible.netcommon.net_put:
+    src: /tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt
+    dest: nvram:startup-config
+  when: inventory_hostname in groups['cisco']
+  register: cisco_changed
+
+- name: reload the os
+  cisco.ios.ios_command:
+    commands: 
+      - command: reload
+        prompt: 'Proceed with reload\? \[confirm\]'
+        answer: 'y'
+  when: 
+    - inventory_hostname in groups['cisco']
+    - cisco_changed.changed
+
+- name: waiting for reboot
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 22
+    delay: 60
+    timeout: 350
+  connection: network_cli
+  delegate_to: localhost
+  when: 
+    - inventory_hostname in groups['cisco']
+    - cisco_changed.changed

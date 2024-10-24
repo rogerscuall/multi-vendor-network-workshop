@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+mark { 
+  background-color: red;
+  color: black;
+}
+</style>
+  <title>Compliance Dashboard</title>
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$(function() {
+$( "#accordion > div" ).accordion({
+    header: "h3",
+    active: false,
+collapsible: true
+});
+});
+</script>
+</head>
+<body>
+  {% include 'header.j2' %}
+<section>
+<center>
+<h1>Ansible Network Automation Compliance Dashboard</h1>
+</center>
+<table class="main_net_table">
+    <thead>
+        <tr>
+            <th>Network Device</th>
+            <th>Management</th>
+            <th>Routing</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for network_switch in groups['network']|sort %}
+{% if hostvars[network_switch].ansible_facts.network_resources is defined %}
+        <tr>
+            <td class="summary_info">
+              <div id="hostname">
+              <p class="hostname"><img class="router_image" src="router.png" alt="picture of network device">{{ hostvars[network_switch].ansible_net_hostname }}</p>
+            </div>
+              <div id="net_info_div">
+              <table class="net_info">
+              <tbody>
+                <tr>
+                  <td>Platform</td>
+                  <td class="sub_net_info">{% set ansible_network_os = hostvars[network_switch]['ansible_net_system'] %}{{ vendor[ansible_network_os]}} {{hostvars[network_switch]['ansible_net_system'] }}</td>
+                </tr>
+                <tr>
+                  <td>Code Version</td>
+                  <td class="sub_net_info">{% if hostvars[network_switch]['ansible_net_version'] != desired_ios_version and hostvars[network_switch]['ansible_network_os'] == 'cisco.ios.ios' %}<mark>{{hostvars[network_switch]['ansible_net_version']}}</mark>{% elif hostvars[network_switch]['ansible_net_version'] != desired_eos_version and hostvars[network_switch]['ansible_network_os'] == 'arista.eos.eos' %}<mark>{{hostvars[network_switch]['ansible_net_version']}}</mark>{% elif hostvars[network_switch]['ansible_net_version'] != desired_junos_version and hostvars[network_switch]['ansible_network_os'] == 'junipernetworks.junos.junos' %}<mark>{{hostvars[network_switch]['ansible_net_version']}}</mark>{% else %}{{hostvars[network_switch]['ansible_net_version']}}{% endif %}</td>               
+                </tr>
+                <tr>
+                  <td>Model</td>
+                  <td class="sub_net_info">{{ hostvars[network_switch]['ansible_net_model'] }}</td>
+                </tr>
+                <tr>
+                  <td>Serial Number</td>
+                  <td class="sub_net_info">{{ hostvars[network_switch]['ansible_net_serialnum'] }}</td>
+                </tr>
+              </tbody>
+              </table>
+
+
+            {% include 'ansible.j2' %}
+          </div>
+
+            </td>
+
+            <td>
+            {% include 'snmp.j2' %}
+            {% include 'logging_global.j2' %}
+            </td>
+            <td>
+            {% include 'ospf.j2' %}
+            {% include 'interfaces.j2' %}
+            </td>
+            <td>
+            
+            
+            </td>
+        </tr>
+{% endif %}
+{% endfor %}
+    </tbody>
+</table>
+<center><p>Created with</p><br><img src="webpage_logo.png" width="300" alt="red hat ansible automation platform logo">
+<p>The source code to create this report can be found at <a href="https://github.com/network-automation/toolkit">https://github.com/network-automation/toolkit</a><br><br>
+If you are new to Ansible Automation check out the following links:<br>
+<a href="https://docs.ansible.com/ansible/latest/user_guide/intro_getting_started.html">Getting Started</a><br>
+<a target="_blank" href="https://ansible.com/workshops">Free hands-on workshops</a><br>
+<a href="https://youtube.com/ansibleautomation">Youtube Videos</a><br>
+</p>
+</center>
+</section>
+</div>
+</body>
+</html>

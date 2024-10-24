@@ -1,0 +1,9 @@
+l3_interfaces:
+-   ipv4:
+    -   address: 10.100.100.2/24
+    name: gr-0/0/0
+    unit: '0'
+-   ipv4:
+    -   address: 192.168.3.3/32
+    name: lo0
+    unit: '0'

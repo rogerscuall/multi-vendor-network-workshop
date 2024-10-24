@@ -1,0 +1,5 @@
+---
+- name: Gather arista eos facts
+  arista.eos.eos_facts:
+    gather_subset: config
+    gather_network_resources: "{{ network_resource | default('all') }}"

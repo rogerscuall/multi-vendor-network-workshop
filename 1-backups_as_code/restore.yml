@@ -1,0 +1,32 @@
+---
+- name: Restore Router Configs from Gitea in Branches
+  hosts: "{{ _group }}"
+  gather_facts: True
+  vars:
+    ansible_network_cli_ssh_type: paramiko
+
+  tasks:
+    - debug:
+        msg: "branch: {{branch_name}}"
+      delegate_to: "localhost"
+      run_once: true
+
+    - name: Retrieve a repository from a distant location and make it available to the local EE
+      ansible.scm.git_retrieve:
+        origin:
+          url: "http://gitea:gitea@ansible-1:3000/gitea/network-demos-repo.git"
+        parent_directory: /tmp/
+        branch:
+          name: "{{branch_name}}"
+          duplicate_detection: no  
+      delegate_to: "localhost"
+      run_once: true
+
+    - name: The network restore task
+      ansible.builtin.include_role:
+        name: network.restore.run
+      vars:
+        ansible_connection: network_cli
+        operation: restore
+        data_store:
+           local: "/tmp/network-demos-repo/network_backup_files/{{inventory_hostname}}.txt"

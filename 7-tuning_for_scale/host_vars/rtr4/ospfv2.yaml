@@ -1,0 +1,8 @@
+ospfv2:
+    processes:
+    -   max_lsa:
+            count: 12000
+        process_id: 1
+        redistribute:
+        -   routes: connected
+        router_id: 192.168.4.4

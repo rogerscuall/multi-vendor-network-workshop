@@ -1,0 +1,20 @@
+---
+- name: Compliance Dashboard
+  hosts: network
+  gather_facts: false
+  
+  tasks:
+    - name: Load read facts role
+      ansible.builtin.include_role:
+        name: "../roles/facts"
+
+- name: Build report with facts
+  hosts: ansible-1
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: Build a report
+      ansible.builtin.include_role:
+        name: "../roles/build_report_container"

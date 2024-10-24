@@ -1,0 +1,5 @@
+set interfaces gr-0/0/0 unit 1 tunnel source {{ hostvars['rtr3'].private_ip }}
+set interfaces gr-0/0/0 unit 1 tunnel destination {{ hostvars['rtr4'].ansible_host }}
+set interfaces gr-0/0/0 unit 1 family inet address {{ rtr3_tu1 }}/24
+set interfaces gr-0/0/0 unit 1 description {{ rtr3_desc }}
+set protocols ospf area 0.0.0.0 interface gr-0/0/0.01  

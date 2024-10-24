@@ -1,0 +1,645 @@
+- name: Playbook to configure ansible controller
+  hosts: localhost
+  connection: local
+  vars:
+    user: "{{ username }}"
+
+  environment:
+    CONTROLLER_HOST: "ansible-1"
+    CONTROLLER_USERNAME: "admin"
+    CONTROLLER_PASSWORD: "{{ password }}"
+    CONTROLLER_VERIFY_SSL: false
+
+  tasks:
+    - name: Create projects
+      ansible.controller.project:
+        name: Student Project
+        organization: "Red Hat network organization"
+        scm_url: "http://ansible-1:3000/gitea/network-demos-repo.git"
+        scm_type: git
+        allow_override: true
+        state: present
+        scm_update_on_launch: yes
+
+    - name: Add group
+      ansible.controller.group:
+        name: cisco
+        variables:
+          ansible_connection: network_cli
+          ansible_network_os: cisco.ios.ios
+        inventory: "Workshop Inventory"
+        state: present
+
+    - name: Add group
+      ansible.controller.group:
+        name: arista
+        variables:
+          ansible_connection: network_cli
+          ansible_network_os: arista.eos.eos
+          ansible_become: "true"
+          ansible_become_method: enable
+        inventory: "Workshop Inventory"
+
+    - name: Add group
+      ansible.controller.group:
+        name: juniper
+        variables:
+          ansible_connection: netconf
+          ansible_network_os: junipernetworks.junos.junos
+        inventory: "Workshop Inventory"
+        state: present
+
+    - name: Create Execution Environments
+      ansible.controller.execution_environment:
+        name: "Validated Network"
+        image: registry.gitlab.com/redhatautomation/validated-network-ee:latest
+        pull: missing
+
+    - name: Gitea Credential Type
+      ansible.controller.credential_type:
+        injectors:
+          extra_vars:
+            email: "{{ email | default ('{{ email }}') }}"
+            password: "{{ git_password | default ('{{ git_password }}') }}"
+            username: "{{ username | default ('{{ username }}') }}"
+            token: "{{ git_password | default ('{{ git_password }}') }}"
+        inputs:
+          fields:
+            - id: username
+              label: Username
+              type: string
+            - id: password
+              label: Password
+              secret: true
+              type: string
+            - id: email
+              label: Email
+              type: string
+          required:
+            - username
+            - password
+            - email
+        kind: cloud
+        name: Gitea Student
+
+    - name: Gitea Credential
+      ansible.controller.credential:
+        credential_type: Gitea Student
+        description: ""
+        inputs:
+          username: "gitea"
+          password: "gitea"
+          email: admin@example.com
+        name: Gitea Credential
+        organization: "Red Hat network organization"
+
+    # 1-Backups As Code
+    - name: Create a job-template - Network-Backups-Git
+      ansible.controller.job_template:
+        name: "Network-Backups-Git"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "1-backups_as_code/backups.yml"
+        credentials:
+          - "Workshop Credential"
+          - "Gitea Credential"
+          - "Controller Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+        survey_enabled: true
+        survey_spec:
+          name: ""
+          description: ""
+          spec:
+            - question_name: Would you like to add a custom branch name or ignore for the default?
+              type: text
+              max: 1024
+              min: 0
+              variable: branch_name
+              required: false
+              default: ""
+            - question_name: Which Group or Groups to Backup Configurations
+              type: multiselect
+              variable: _group
+              required: true
+              default: ""
+              choices:
+                - cisco
+                - arista
+                - juniper
+      when: inventory_hostname == 'localhost'
+
+    # 2-Network Compliance Dashboard
+    - name: Create a job-template - Network-Config
+      ansible.controller.job_template:
+        name: "Network-Config"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "2-network_compliance_dashboard/config.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Compliance-Dashboard
+      ansible.controller.job_template:
+        name: "Network-Compliance-Dashboard"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "2-network_compliance_dashboard/network_report.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    # 3-Network-Check-Compliance Demo
+    - name: Create a job-template - Network-Check-Compliance
+      ansible.controller.job_template:
+        name: "Network-Check-Compliance"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "3-network_compliance_checks_remediations/compliance.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        job_type: check
+        state: "present"
+
+    - name: Create a job-template - Network-Run-Compliance
+      ansible.controller.job_template:
+        name: "Network-Run-Compliance"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "3-network_compliance_checks_remediations/compliance_run.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a workflow job template
+      ansible.controller.workflow_job_template:
+        name: Network-Compliance-Workflow
+        inventory: "Workshop Inventory"
+        organization: "Red Hat network organization"
+        state: present
+        survey_enabled: true
+        survey:
+          name: ""
+          description: ""
+          spec:
+            - question_name: Which groups/devices to run checks against?
+              type: multiselect
+              variable: _group
+              required: true
+              default: ""
+              choices:
+                - cisco
+                - arista
+                - juniper
+            - question_name: Please select the desired compliance roles?
+              type: multiselect
+              variable: tag
+              required: true
+              default: ""
+              choices:
+                - logging
+                - snmp
+                - ntp
+                - stig-ios
+                - stig-junos
+            - question_name: Do you want to save to Startup-config?
+              type: multiplechoice
+              variable: save
+              required: true
+              default: 'no'
+              choices:
+                - 'yes'
+                - 'no'
+
+    - name: Node Network-Run-Compliance
+      ansible.controller.workflow_job_template_node:
+        identifier: Network-Run-Compliance
+        workflow: "Network-Compliance-Workflow"
+        unified_job_template: Network-Run-Compliance
+        organization: "Red Hat network organization"
+        state: present
+
+    - name: Node Change Approval
+      ansible.controller.workflow_job_template_node:
+        identifier: "Change Approval"
+        workflow_job_template: "Network-Compliance-Workflow"
+        organization: "Red Hat network organization"
+        approval_node:
+          name: "Change Approval"
+          timeout: 0
+        state: present
+
+    - name: Node Change Approval
+      ansible.controller.workflow_job_template_node:
+        identifier: "Change Approval"
+        workflow_job_template: "Network-Compliance-Workflow"
+        organization: "Red Hat network organization"
+        success_nodes:
+          - Network-Run-Compliance
+        state: present
+
+    - name: Node Network-Check-Compliance
+      ansible.controller.workflow_job_template_node:
+        identifier: Network-Check-Compliance
+        workflow: "Network-Compliance-Workflow"
+        unified_job_template: Network-Check-Compliance
+        organization: "Red Hat network organization"
+        success_nodes: "Change Approval"
+        state: present
+
+    # 4-Multi-Vendor Validated Content (BGP)
+    - name: Create a job-template - Network-Troubleshooting
+      ansible.controller.job_template:
+        name: "Network-Troubleshooting"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "4-multi_vendor_validated_content_bgp/troubleshoot.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Validated-Persist
+      ansible.controller.job_template:
+        name: "Network-Validated-Persist"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "4-multi_vendor_validated_content_bgp/persist.yml"
+        credentials:
+          - "Workshop Credential"
+          - "Gitea Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Validated-List
+      ansible.controller.job_template:
+        name: "Network-Validated-List"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "4-multi_vendor_validated_content_bgp/list.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Validated-Deploy
+      ansible.controller.job_template:
+        name: "Network-Validated-Deploy"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "4-multi_vendor_validated_content_bgp/deploy.yml"
+        credentials:
+          - "Workshop Credential"
+          - "Gitea Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Validated-Detect
+      ansible.controller.job_template:
+        name: "Network-Validated-Detect"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "4-multi_vendor_validated_content_bgp/detect.yml"
+        credentials:
+          - "Workshop Credential"
+          - "Gitea Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Validated-Remediate
+      ansible.controller.job_template:
+        name: "Network-Validated-Remediate"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "4-multi_vendor_validated_content_bgp/remediate.yml"
+        credentials:
+          - "Workshop Credential"
+          - "Gitea Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+# 5-Brownfield Switches Resource Modules
+    - name: Create a job-template - Network-Brownfield-Resource-Modules
+      ansible.controller.job_template:
+        name: "Network-Brownfield-Resource-Modules"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "5-brownfield_switches_resource_modules/brownfield.yml"
+        credentials:
+          - "Workshop Credential"
+          - "Gitea Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Brownfield-Deploy
+      ansible.controller.job_template:
+        name: "Network-Brownfield-Resource-Deploy"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "5-brownfield_switches_resource_modules/deploy.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Brownfield-Diff
+      ansible.controller.job_template:
+        name: "Network-Brownfield-Resource-Diff"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "5-brownfield_switches_resource_modules/diff.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        job_type: check
+        diff_mode: true
+        state: "present"    
+
+    - name: Create a job-template - Network-Brownfield-Check-Ports
+      ansible.controller.job_template:
+        name: "Network-Brownfield-Check-Ports"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "5-brownfield_switches_resource_modules/checkports.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"   
+    
+    - name: Add Host
+      ansible.controller.host:
+        name: nxos
+        inventory: "Workshop Inventory"
+        state: present
+        enabled: true
+        variables:
+          ansible_user: admin
+          ansible_password: Admin_1234!
+          ansible_network_os: cisco.nxos.nxos
+          ansible_connection: ansible.netcommon.network_cli
+          ansible_host: sandbox-nxos-1.cisco.com
+
+    - name: Add group
+      ansible.controller.group:
+        name: switches
+        hosts:
+        - nxos
+        variables:
+          ansible_connection: network_cli
+          ansible_network_os: cisco.ios.ios
+        inventory: "Workshop Inventory"
+        state: present
+
+# 6-Network-Upgrade-As-Code Demo
+    - name: Create a job-template - Network-Upgrade-Staging
+      ansible.controller.job_template:
+        name: "Network-Upgrade-Staging"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "6-network_upgrade_as_code/staging.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Upgrade-Upgrade
+      ansible.controller.job_template:
+        name: "Network-Upgrade-Upgrade"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "6-network_upgrade_as_code/upgrade.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a job-template - Network-Upgrade-Validation
+      ansible.controller.job_template:
+        name: "Network-Upgrade-Validation"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "6-network_upgrade_as_code/validate_network.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+
+    - name: Create a workflow job template
+      ansible.controller.workflow_job_template:
+        name: Network-Upgrade-Workflow
+        inventory: "Workshop Inventory"
+        organization: "Red Hat network organization"
+        state: present
+        survey_enabled: true
+        survey:
+          name: ""
+          description: ""
+          spec:
+            - question_name: Which Cisco IOS version to Stage
+              type: multiplechoice
+              variable: image_staging
+              required: true
+              default: ""
+              choices:
+                - 17.15.01a
+            - question_name: Which Cisco IOS version to Upgrade
+              type: multiplechoice
+              variable: image_upgrade
+              required: true
+              default: ""
+              choices:
+                - 17.06.06a
+                - 17.07.01a
+
+    - name: Node Network-Upgrade-Post_validation
+      ansible.controller.workflow_job_template_node:
+        identifier: Network-Upgrade-Post_validation
+        workflow: "Network-Upgrade-Workflow"
+        unified_job_template: Network-Upgrade-Validation
+        organization: "Red Hat network organization"
+        state: present
+
+    - name: Node Network-Upgrade-Upgrade
+      ansible.controller.workflow_job_template_node:
+        identifier: Network-Upgrade-Upgrade
+        workflow: "Network-Upgrade-Workflow"
+        unified_job_template: Network-Upgrade-Upgrade
+        organization: "Red Hat network organization"
+        success_nodes:
+          - Network-Upgrade-Post_validation
+        state: present
+
+    - name: Node Network-Upgrade-Pre_validation
+      ansible.controller.workflow_job_template_node:
+        identifier: Network-Upgrade-Pre_validation
+        workflow: "Network-Upgrade-Workflow"
+        unified_job_template: Network-Upgrade-Validation
+        organization: "Red Hat network organization"
+        success_nodes:
+          - Network-Upgrade-Upgrade
+        state: present
+
+    - name: Node Upgrade Approval
+      ansible.controller.workflow_job_template_node:
+        identifier: "Upgrade Approval"
+        workflow_job_template: "Network-Upgrade-Workflow"
+        organization: "Red Hat network organization"
+        approval_node:
+          name: "Upgrade Approval"
+          timeout: 0
+        state: present
+
+    - name: Node Upgrade Approval
+      ansible.controller.workflow_job_template_node:
+        identifier: "Upgrade Approval"
+        workflow_job_template: "Network-Upgrade-Workflow"
+        organization: "Red Hat network organization"
+        success_nodes:
+          - Network-Upgrade-Pre_validation
+        state: present
+
+    - name: Node Network-Upgrade-Staging
+      ansible.controller.workflow_job_template_node:
+        identifier: Network-Upgrade-Staging
+        workflow: "Network-Upgrade-Workflow"
+        unified_job_template: Network-Upgrade-Staging
+        organization: "Red Hat network organization"
+        success_nodes: "Upgrade Approval"
+        state: present
+
+  # 7-Tuning for Scale
+    - name: Create a job-template - Network-Config-Push
+      ansible.controller.job_template:
+        name: "Network-Config-Push"
+        organization: "Red Hat network organization"
+        inventory: "Workshop Inventory"
+        project: "Student Project"
+        playbook: "7-tuning_for_scale/onboard_network.yml"
+        credentials:
+          - "Workshop Credential"
+        execution_environment: "Validated Network"
+        state: "present"
+        survey_enabled: true
+        survey_spec:
+          name: ""
+          description: ""
+          spec:
+      
+            - question_name: Do you want to send an error
+              type: multiplechoice
+              variable: error
+              required: true
+              default: "no"
+              choices:
+                - "yes"
+                - "no"    
+            - question_name: Please select the Serial Batch Percentages
+              type: multiselect
+              variable: serials
+              required: true
+              default: ""
+              choices:
+                - "1"
+                - "10%"
+                - "25%"
+                - "50%"
+                - "100%"         
+            - question_name: Please select the Max_Fail_Percentage
+              type: multiplechoice
+              variable: max_fail
+              required: true
+              default: ""
+              choices:
+                - "0"
+                - "5"
+                - "10"
+                - "25"
+                - "50"
+                - "75"
+                - "100"      
+            - question_name: Please select the IP Address for rtr1 tu0
+              type: multiplechoice
+              variable: rtr1_tu0
+              required: true
+              default: "10.100.100.1"
+              choices:
+                - "10.100.100.1"
+            - question_name: Please provide description for rtr1 tu0
+              type: text
+              variable: rtr1_tu0_desc
+              required: true
+              default: ""
+              choices: ''
+              max: 1024
+              min: 0
+            - question_name: Please select the IP Address for rtr1 tu1
+              type: multiplechoice
+              variable: rtr1_tu1
+              required: true
+              default: "10.200.200.1"
+              choices:
+                - "10.200.200.1"
+            - question_name: Please provide description for rtr1 tu1
+              type: text
+              variable: rtr1_tu1_desc
+              required: true
+              default: "rtr1 tu1"
+              choices: ''
+              max: 1024
+              min: 0
+            - question_name: Please select the IP Address for rtr2 tu0
+              type: multiplechoice
+              variable: rtr2_tu0
+              required: true
+              default: "10.102.102.2"
+              choices:
+                - "10.102.102.2"
+            - question_name: Please provide description for rtr2 tu0
+              type: text
+              variable: rtr2_tu0_desc
+              required: true
+              default: ""
+              choices: ''
+              max: 1024
+              min: 0
+            - question_name: Please select the IP Address for rtr2 tu1
+              type: multiplechoice
+              variable: rtr2_tu1
+              required: true
+              default: "10.200.200.2"
+              choices:
+                - "10.200.200.2"
+            - question_name: Please provide description for rtr2 tu1
+              type: text
+              variable: rtr2_tu1_desc
+              required: true
+              default: "rtr2 tu1"
+              choices: ''
+              max: 1024
+              min: 0
+
+            
+     

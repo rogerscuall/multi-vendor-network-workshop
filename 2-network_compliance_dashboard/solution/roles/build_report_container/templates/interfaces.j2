@@ -1,0 +1,33 @@
+<!-- INTERNAL TABLE FOR INTERFACES -->
+<div id="accordion">
+<div>
+<h3>Ospf Interface Configuration</h3>
+<div class="net_content">
+{% if hostvars[network_switch]['ansible_network_resources']['interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['interfaces']|length > 0  %}
+<table id="subtable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Interface Enabled</th>
+            <th>Neighbor Interface</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for interface in hostvars[network_switch]['ansible_network_resources']['interfaces'] %}
+        <tr>
+        <td>{{ interface['name'] }}</td>
+        <td>{% if interface['enabled'] != true %}<mark>{{interface['enabled']}}</mark>{% else %}{{interface['enabled']}}{% endif %}</td>
+        <td>{% if interface ['name'] == 'Tunnel0' %}True{% elif interface ['name'] == 'gr-0/0/0'%}True{% else %}False{% endif %}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% elif hostvars[network_switch]['ansible_network_resources']['interfaces'] is defined and hostvars[network_switch]['ansible_network_resources']['interfaces']|length == 0 %}
+No interfaces configured on this device
+{% else %}
+No Interface information available
+{% endif %}
+</div>
+</div>
+</div>
+<!-- END INTERNAL TABLE FOR INTERFACES -->

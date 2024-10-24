@@ -1,0 +1,8 @@
+---
+- name: Gather cisco ios facts
+  cisco.ios.ios_facts:
+    gather_subset: config
+    gather_network_resources: "{{ network_resource | default('all') }}"
+
+
+

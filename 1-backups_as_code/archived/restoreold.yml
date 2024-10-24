@@ -1,0 +1,30 @@
+---
+- name: Backup Cisco Configs to Gitea in Branches
+  hosts: "{{ _group }}"
+  gather_facts: False
+
+  tasks:
+    - name: Clone a Repo to EE
+      ansible.builtin.shell:
+        cmd: "git clone -b {{ scm_branch }} http://gitea:gitea@ansible-1:3000/gitea/network-demos-repo.git"
+        chdir: /tmp/
+      delegate_to: "localhost"
+      run_once: true
+
+    - name: push configs to devices
+      cisco.ios.ios_config:
+        src: /tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt
+        save_when: changed
+      when: inventory_hostname in groups['cisco']
+
+    - name: push configs to devices
+      arista.eos.eos_config:
+        src: /tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt
+        save_when: changed
+      when: inventory_hostname in groups['arista']
+
+    - name: push configs to devices
+      junipernetworks.junos.junos_config:
+        src: /tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt
+        confirm_commit: true
+      when: inventory_hostname in groups['juniper']

@@ -1,0 +1,13 @@
+---
+- name: Create configuration files from the resource modules
+  hosts: network
+  gather_facts: false
+  tasks:
+   
+    - name: Network Resource Manager
+      ansible.builtin.include_role:
+        name: resource_manager
+      vars:
+        operation: list
+       
+  

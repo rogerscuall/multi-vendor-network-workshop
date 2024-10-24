@@ -1,0 +1,19 @@
+!
+interface loopback 100
+ ip address 192.168.40.4 255.255.255.0
+!
+interface Tunnel1
+   mtu 1476
+   ip address {{ rtr4_tu1 }}/24
+   description {{ rtr4_desc }}
+   ip ospf network point-to-point
+   ip ospf area 0.0.0.0
+   tunnel mode gre
+   tunnel source interface Ethernet1
+   tunnel destination {{ hostvars['rtr3'].ansible_host}}
+   tunnel path-mtu-discovery
+   tunnel ttl 10
+!
+router ospf 1
+   network 0.0.0.0/0 area 0.0.0.0
+   tunnel routes

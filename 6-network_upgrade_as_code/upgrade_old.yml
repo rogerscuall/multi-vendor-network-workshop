@@ -1,0 +1,63 @@
+---
+- name: Playbook to upgrade .bin to router bootflash
+  hosts: rtr1
+  gather_facts: False
+  vars:
+   new_version: "{{ image_upgrade }}" 
+   #17.06.06a
+   #17.07.01a
+
+   new_image_ios: "c8000v-universalk9.{{ new_version }}.SPA.bin" 
+
+  tasks:
+
+  - name: change boot system to load new image next reload
+    cisco.ios.ios_config:
+      lines: 
+      - "boot system bootflash:{{new_image_ios}}"
+      before:
+      - 'no boot system'
+      save_when: always
+
+  - name: check if correct image still exist in bootflash, if not FAIL the playbook
+    ios_command:
+      commands: 'dir bootflash: | include {{ new_image_ios }}'
+    register: check_image
+    failed_when: check_image.stdout[0].find( new_image_ios )  == -1
+ 
+  - name: install new version from reboot
+    cisco.ios.ios_command:
+      commands: 
+        - command: reload
+          prompt: 'Proceed with reload\? \[confirm\]'
+          answer: 'y'
+    
+  - name: waiting for reboot to load new image
+    wait_for:
+      host: "{{ ansible_host }}"
+      port: 22
+      delay: 30
+      timeout: 350
+    connection: network_cli
+
+- name: Playbook to confirm bootloader after reload
+  hosts: rtr1
+  gather_facts: False
+  vars:
+   new_version: "{{ image_upgrade }}" 
+   new_image_ios: "c8000v-universalk9.{{ new_version }}.SPA.bin" 
+
+  tasks:
+
+  - name: show bootloader config
+    cisco.ios.ios_command:
+      commands: 'sh run | s boot'
+    register: boot2
+
+  - name: assert bootloader config changed
+    ansible.builtin.assert:
+      that: 
+        - "new_image_ios in boot2['stdout'][0]"
+      fail_msg: "{{new_image_ios}} is not present"
+      success_msg: "{{new_image_ios}} is present"
+  

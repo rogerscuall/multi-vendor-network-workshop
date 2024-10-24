@@ -1,0 +1,59 @@
+---
+- name: Push Router Configurations with Resource Modules using Tuning
+  hosts: routers
+  gather_facts: false
+  serial: "{{ serials }}"
+  max_fail_percentage: "{{ max_fail }}"
+  vars:
+    errors: "{{ error }}"
+
+  tasks:
+    - name: Error or no Error
+      ansible.builtin.fail:
+        msg: "This task just failed"
+      when: errors == 'yes'
+
+    - name: Configure bgp_address_family
+      cisco.ios.ios_bgp_address_family:
+        config: "{{ bgp_address_family | default (omit, True) }}"
+        state: merged
+      when: inventory_hostname in groups['cisco']
+
+    - name: Configure bgp_address_family
+      arista.eos.eos_bgp_address_family:
+        config: "{{ bgp_address_family | default (omit, True) }}"
+        state: merged
+      when: inventory_hostname == 'rtr2'
+
+    - name: Configure interfaces
+      cisco.ios.ios_interfaces:
+        config: "{{ interfaces | default (omit, True) }}"
+        state: merged
+      when: inventory_hostname in groups['cisco']
+
+    - name: Configure interfaces
+      arista.eos.eos_interfaces:
+        config: "{{ interfaces | default (omit, True) }}"
+        state: merged
+      when: inventory_hostname in groups['arista']
+
+    - name: Configure interfaces
+      junipernetworks.junos.junos_interfaces:
+        config: "{{ interfaces | default (omit, True) }}"
+        state: merged
+      when: inventory_hostname in groups['juniper']
+
+- name: Prepare network topology with GRE tunnel/template for network onboard
+  hosts: routers
+  gather_facts: false
+
+  tasks:
+    - name: prepare cisco
+      cisco.ios.ios_config:
+        src: templates/rtr1.j2
+      when: inventory_hostname == 'rtr1'
+
+    - name: prepare arista
+      arista.eos.eos_config:
+        src: templates/rtr2.j2
+      when: inventory_hostname == 'rtr2'

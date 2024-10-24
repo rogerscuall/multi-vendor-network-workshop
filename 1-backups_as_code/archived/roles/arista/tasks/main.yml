@@ -1,0 +1,38 @@
+---   
+
+- name: enable SCP
+  arista.eos.eos_config:
+    lines: 
+    - username ec2-user privilege 15 role network-admin nopassword
+    - aaa authentication login console local
+    - aaa authorization exec default local
+    save_when: always
+  when: inventory_hostname in groups['arista']
+  
+- name: copy file to arista
+  ansible.netcommon.net_put:
+    src: /tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt
+    dest: //mnt/flash/startup-config
+  when: inventory_hostname in groups['arista']
+
+- name: reload the os
+  ansible.netcommon.cli_command:
+    command: reload
+    check_all: true
+    prompt: 
+    - 'System configuration has been modified. Save\? \[yes/no/cancel/diff\]:'
+    - 'Proceed with reload\? \[confirm\]'
+    answer: 
+    - 'n'
+    - 'y'
+  when: inventory_hostname in groups['arista']
+
+- name: waiting for reboot
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 22
+    delay: 60
+    timeout: 350
+  connection: network_cli
+  delegate_to: localhost
+  when: inventory_hostname in groups['arista']

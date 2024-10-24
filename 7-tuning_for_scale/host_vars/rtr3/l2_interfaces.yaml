@@ -1,0 +1,7 @@
+l2_interfaces:
+-   enhanced_layer: false
+    name: gr-0/0/0
+    unit: 0
+-   enhanced_layer: false
+    name: lo0
+    unit: 0

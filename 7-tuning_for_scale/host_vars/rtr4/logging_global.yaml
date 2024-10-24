@@ -1,0 +1,12 @@
+logging_global:
+    buffered:
+        buffer_size: 12000
+        severity: notifications
+    console:
+        severity: critical
+    facility: local5
+    hosts:
+    -   name: 1.1.1.2
+    -   name: 1.1.1.3
+    trap:
+        severity: errors

@@ -1,0 +1,7 @@
+interfaces:
+-   enabled: true
+    name: gr-0/0/0
+-   enabled: true
+    name: lo0
+-   enabled: true
+    name: fxp0

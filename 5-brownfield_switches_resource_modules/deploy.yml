@@ -1,0 +1,35 @@
+---
+- name: Deploy configuration changes
+  hosts: switches
+  gather_facts: false
+  vars:
+   resources:
+    - static_routes
+    - ntp_global
+    - logging_global
+    - hostname
+    - snmp_server
+    - vlans
+    - interfaces
+    - l2_interfaces
+    - l3_interfaces
+    - bfd_interfaces
+    - lldp_global
+    - lldp_interfaces
+    - ospf_interfaces
+    - prefix_lists
+    - route_maps
+    - telemetry
+
+  tasks:
+    
+    - name: Apply configuration
+      ansible.netcommon.network_resource:
+        os_name: cisco.nxos.nxos
+        name: "{{ item }}"
+        config: "{{ hostvars[inventory_hostname][item] }}"
+        state: merged
+      loop: "{{ resources }}"
+       
+      
+        

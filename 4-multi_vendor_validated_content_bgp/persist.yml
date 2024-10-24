@@ -1,0 +1,57 @@
+---
+- name: Create configuration files from the resource modules
+  hosts: network, localhost
+  gather_facts: false
+  tasks:
+    - name: Retrieve a repository from a distant location and make it available to the local EE
+      ansible.scm.git_retrieve:
+        origin:
+          url: "http://gitea:gitea@ansible-1:3000/gitea/network-demos-repo.git"
+        parent_directory: /tmp/
+        branch:
+          name: "master"
+          duplicate_detection: no
+      register: repository
+      when: inventory_hostname == 'localhost'
+
+    - name: Network Resource Manager
+      ansible.builtin.include_role:
+        name: resource_manager
+      vars:
+        operation: persist
+        resources:
+          - "acl_interfaces"
+          - "acls"
+          - "bgp_address_family"
+          - "bgp_global"
+          - "hostname"
+          - "interfaces"
+          - "l2_interfaces"
+          - "l3_interfaces"
+          - "lacp"
+          - "lacp_interfaces"
+          - "lag_interfaces"
+          - "lldp_global"
+          - "lldp_interfaces"
+          - "logging_global"
+          - "ntp_global"
+          - "ospf_interfaces"
+          - "ospfv2"
+          - "ospfv3"
+          - "prefix_lists"
+          - "route_maps"
+          - "service"
+          - "snmp_server"
+          - "static_routes"
+        data_store:
+          local: "/tmp/network-demos-repo/4-multi_vendor_validated_content_bgp"
+      when: inventory_hostname != 'localhost'
+
+    - name: Publish the changes
+      ansible.scm.git_publish:
+        path: "/tmp/network-demos-repo"
+        token: "{{ password }}"
+        user:
+          name: "{{ username }}"
+          email: "{{ email }}"
+      when: inventory_hostname == 'localhost'

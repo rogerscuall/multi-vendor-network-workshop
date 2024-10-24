@@ -1,0 +1,11 @@
+l3_interfaces:
+-   ipv4:
+    -   address: dhcp
+    name: Ethernet1
+-   name: Ethernet100
+-   ipv4:
+    -   address: 192.168.4.4/32
+    name: Loopback0
+-   ipv4:
+    -   address: 10.101.101.4/24
+    name: Tunnel0

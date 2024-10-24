@@ -1,0 +1,5 @@
+lacp_interfaces:
+-   name: loopback0
+-   name: Tunnel0
+-   name: Tunnel1
+-   name: GigabitEthernet1

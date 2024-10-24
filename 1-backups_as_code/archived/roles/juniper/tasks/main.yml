@@ -1,0 +1,7 @@
+---
+- name: push configs to juniper to override and commit
+  junipernetworks.junos.junos_config:
+    src: /tmp/network-demos-repo/network_backup_files/{{ inventory_hostname }}.txt
+    confirm_commit: true
+    update: override
+  when: inventory_hostname in groups['juniper']

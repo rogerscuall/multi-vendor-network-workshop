@@ -1,0 +1,12 @@
+interfaces:
+-   enabled: true
+    name: GigabitEthernet1
+-   enabled: true
+    name: Loopback0
+-   enabled: true
+    description: Cisco  #change
+    name: Tunnel0
+-   enabled: true
+    name: Tunnel1
+-   enabled: true
+    name: VirtualPortGroup0

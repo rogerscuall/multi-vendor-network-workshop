@@ -1,0 +1,17 @@
+static_routes:
+-   address_families:
+    -   afi: ipv4
+        routes:
+        -   dest: 0.0.0.0/0
+            next_hops:
+            -   forward_router_address: 172.16.0.1
+                interface: GigabitEthernet1
+-   address_families:
+    -   afi: ipv4
+        routes:
+        -   dest: 0.0.0.0/0
+            next_hops:
+            -   forward_router_address: 172.16.0.1
+                global: true
+                interface: GigabitEthernet1
+    vrf: GS

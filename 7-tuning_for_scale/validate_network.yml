@@ -1,0 +1,49 @@
+---
+- name: Validate the Environment
+  hosts: rtr1
+  gather_facts: false
+
+  tasks:
+  - name: Show IP OSPF Neighbor
+    cisco.ios.ios_command:
+     commands:
+      - sh ip ospf neighbor
+    register: ospf
+
+  - name: Assert that OSPF neighbor exists
+    ansible.builtin.assert:
+     that: 
+        - "'FULL/' in ospf['stdout'][0]"
+     fail_msg: "OSPF neighbor is not present"
+     success_msg: "The OSPF Neighbor to {{ rtr1_tu0_desc }}-{{ hostvars['rtr3'].private_ip }} is Full"
+    retries: 3
+    delay: 10
+
+  - name: Show IP BGP Neighbor
+    cisco.ios.ios_command:
+     commands:
+      - sh ip bgp neighbor
+    register: bgp
+
+  - name: Assert that BGP neighbor exists
+    ansible.builtin.assert:
+     that: 
+        - "'Established' in bgp['stdout'][0]"
+     fail_msg: "BGP neighbor is not present"
+     success_msg: "BGP Neighbor to {{ rtr1_tu1_desc }}-{{ hostvars['rtr2'].private_ip }} is Established"
+    retries: 3
+    delay: 10
+
+  - name: Ping the neighbors
+    cisco.ios.ios_ping:
+      dest: "{{ ping_item }}" 
+    register: ping_output
+    loop: 
+      - "{{ hostvars['rtr2'].private_ip }}"
+      - "{{ hostvars['rtr3'].private_ip }}"
+    loop_control:
+        loop_var: ping_item
+
+  - name: Print Ping Output
+    ansible.builtin.debug:
+      msg: "{{ ping_output }}"

@@ -1,0 +1,14 @@
+ospf_interfaces:
+-   address_family:
+    -   afi: ipv4
+        processes:
+            area:
+                area_id: 0.0.0.0
+    name: gr-0/0/0.0
+-   address_family:
+    -   afi: ipv4
+        processes:
+            area:
+                area_id: 0.0.0.0
+            passive: true
+    name: lo0.0

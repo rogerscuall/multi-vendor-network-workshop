@@ -1,0 +1,11 @@
+!
+interface Tunnel1
+   mtu 1476
+   ip address {{ rtr2_tu1 }}/24
+   description {{ rtr2_tu1_desc }}
+   tunnel mode gre
+   tunnel source interface Ethernet1
+   tunnel destination {{ hostvars['rtr1'].ansible_host }}
+   tunnel path-mtu-discovery
+   tunnel ttl 10
+!
