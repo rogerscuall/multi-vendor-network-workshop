@@ -20,7 +20,6 @@
     - name: Gather network information
       cisco.nxos.nxos_facts:
         gather_network_resources:
-          - static_routes
           - ntp_global
           - logging_global
           - hostname
