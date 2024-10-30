@@ -1,10 +1,10 @@
 # Multi-Vendor Network Automation 
  The Multi-Vendor Network Automation training offers five hours of use case based training to become familiar with using the Ansible Automation Platform (AAP) for Network automation. This repository includes eight "immersive" network automation exercises. This training is designed to enhance your team’s knowledge, skills, and confidence with using Ansible Automation Platform (AAP) for networks.
 
-## What this training is
+## What this training is:
 The main focus of this workshop is to automate real world use cases using the power and capabilities of the Ansible Automation Platform. 
 
-## What this training is not
+## What this training is not:
 This training is not focused on extensive playbook development. Although we examine existing playbook content and best practices, there are minimal modifications. 
 
 ### Other options for more `playbook` focused development
