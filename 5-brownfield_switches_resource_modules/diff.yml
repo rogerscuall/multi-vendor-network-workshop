@@ -1,10 +1,10 @@
 ---
-- name: Deploy configuration changes
+- name: Check configuration changes
   hosts: switches
   gather_facts: false
   vars:
    resource:
-   - static_routes
+    - static_routes
     - ntp_global
     - logging_global
     - hostname
@@ -17,8 +17,6 @@
     - lldp_global
     - lldp_interfaces
     - ospf_interfaces
-    - prefix_lists
-    - route_maps
     - telemetry
 
   tasks:

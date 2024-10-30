@@ -17,8 +17,6 @@
     - lldp_global
     - lldp_interfaces
     - ospf_interfaces
-    - prefix_lists
-    - route_maps
     - telemetry
 
   tasks:

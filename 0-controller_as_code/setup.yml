@@ -471,8 +471,7 @@
               required: true
               default: ""
               choices:
-                - 17.06.06a
-                - 17.07.01a
+                - 17.15.01a
 
     - name: Node Network-Upgrade-Post_validation
       ansible.controller.workflow_job_template_node:
