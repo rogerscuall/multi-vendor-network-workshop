@@ -36,6 +36,8 @@ At this point you should observe a host_vars/brownfield.yml file in `5-brownfiel
 
 ### Step 3 - Make a change 
 1. locate Ethernet1/1 add/change the description to `workshop`
+- note, that the N9k is shared publicly, so current config for E1/1 might look different.
+- Also note we are all changing the same interface, hence it will be changing several times.
 ~~~
 interfaces:
 -   name: Vlan1
