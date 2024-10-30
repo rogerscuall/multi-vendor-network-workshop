@@ -4,6 +4,7 @@
   gather_facts: false
   vars:
    resources:
+    - static_routes
     - ntp_global
     - logging_global
     - hostname
