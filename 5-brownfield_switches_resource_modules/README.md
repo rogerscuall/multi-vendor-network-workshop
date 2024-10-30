@@ -58,10 +58,11 @@ git commit -m "deploy"
 git push
 ~~~
 ### Step 4 - Review the Diff
-Run the Job-template `network_brownfield_diff` Job template for the diff.yml playbook to identify the difference between the SSOT `host_vars` versus the running configuration on the switch. 
+Run the Job-template `network_brownfield_diff` Job template for the diff.yml playbook to identify the difference between the SSOT `host_vars` versus the running configuration on the switch. Note the change you made to E1/1... 
+* Notice the job template is running in `check mode` as to not apply any changes.
 
 ### Step 5 - Run the network_brownfield_deploy Job-template 
-This will run the deploy.yml playbook to add the change
+This will run the deploy.yml playbook to add the change in `run mode`.
 
 ### Step 6 - Check Ports 
 * In this exercise we identify interfaces/l2_interfaces that match specific configurations. This demo uses network resource module facts and selectattr filters.
