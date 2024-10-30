@@ -50,7 +50,7 @@
 
     - name: Create a host_vars directory if it does not exist
       ansible.builtin.file:
-        path: "{{ repository['path'] }}/5-brownfield_resource_modules/host_vars/{{ inventory_hostname }}/"
+        path: "{{ repository['path'] }}/5-brownfield_switches_resource_modules/host_vars/{{ inventory_hostname }}/"
         state: directory
         mode: '0755'
       delegate_to: localhost
@@ -58,7 +58,7 @@
     - name: Add network facts to the host_vars
       ansible.builtin.copy:
         content: "{{ ansible_network_resources | to_nice_yaml }}"
-        dest: "{{ repository['path'] }}/5-brownfield_resource_modules/host_vars/{{ inventory_hostname }}/brownfield.yaml"
+        dest: "{{ repository['path'] }}/5-brownfield_switches_resource_modules/host_vars/{{ inventory_hostname }}/brownfield.yaml"
       delegate_to: localhost
 
     - name: Publish the changes
