@@ -61,6 +61,29 @@ git push
 Run the Job-template `network_brownfield_diff` Job template for the diff.yml playbook to identify the difference between the SSOT `host_vars` versus the running configuration on the switch. Note the change you made to E1/1... 
 * Notice the job template is running in `check mode` as to not apply any changes.
 
+- Click into the changed output and json link to see the builtin diff:
+~~~
+{
+  "changed": true,
+  "commands": [
+    "interface Ethernet1/1",
+    "description workshop"
+  ],
+  "before": [
+    {
+      "enabled": true,
+      "name": "Vlan1"
+    },
+    {
+      "description": "cisco profes",
+      "name": "Vlan60"
+    },
+    {
+      "description": "cisco profes",
+      "name": "Vlan61"
+~~~
+truncated
+
 ### Step 5 - Run the network_brownfield_deploy Job-template 
 This will run the deploy.yml playbook to add the change in `run mode`.
 
