@@ -16,12 +16,10 @@ In this exercise we will compare and restore our changes made since Exercise-1, 
 Return to Exercise 1 and rerun the 'Network-Backups-Git' job template. The survey will prompt for optionally naming your branch or inserts default branch naming when ignored. For this exercise, when prompted, name your backup branch `final_config`
 
 ### Step 2 - Launch the Network-Intended Job-template
-Upon lauching the job-template the self service survey will prompt for information.
+Upon launching the job-template the self service survey will prompt for information.
 
 ![survey](../images/survey1.png)
 1. Select the `initial_config` branch from the dropdown. You must also select the groups of devices to run the config drift check against. Go ahead and select all three.
-
- ![survey](../images/survey2.png)
 
  2. Review the output to understand the Diff entries
  Your output may vary. 
