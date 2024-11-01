@@ -49,52 +49,34 @@ In the below output you can glean the following:
 - The final batch ran all of the tasks for rtr3, which was the remaining hosts from 100%
 ~~~
 PLAY [Push Router Configurations with Resource Modules using Tuning] ***********
-TASK [Configure bgp_address_family] ********************************************
-ok: [rtr1]
+
 TASK [Configure interfaces] ****************************************************
-ok: [rtr1]
-TASK [prepare cisco] ***********************************************************
 changed: [rtr1]
 
-PLAY [Push Router Configurations with Resource Modules using Tuning] ***********
-TASK [Configure bgp_address_family] ********************************************
-ok: [rtr2]
-TASK [Configure interfaces] ****************************************************
-ok: [rtr2]
-ok: [rtr4]
-TASK [prepare arista] **********************************************************
-ok: [rtr2]
-PLAY [Push Router Configurations with Resource Modules using Tuning] ***********
-TASK [Configure interfaces] ****************************************************
-ok: [rtr3]
-
-PLAY [Push Router Configurations with Resource Modules using Tuning] ***********
-
 TASK [Configure bgp_address_family] ********************************************
 ok: [rtr1]
 
-TASK [Configure interfaces] ****************************************************
-ok: [rtr1]
-
-TASK [prepare cisco] ***********************************************************
-changed: [rtr1]
-
 PLAY [Push Router Configurations with Resource Modules using Tuning] ***********
 
-TASK [Configure bgp_address_family] ********************************************
-ok: [rtr2]
-
 TASK [Configure interfaces] ****************************************************
-ok: [rtr2]
 ok: [rtr4]
+ok: [rtr2]
 
-TASK [prepare arista] **********************************************************
+TASK [Configure bgp_address_family] ********************************************
 ok: [rtr2]
 
 PLAY [Push Router Configurations with Resource Modules using Tuning] ***********
 
 TASK [Configure interfaces] ****************************************************
 ok: [rtr3]
+
+PLAY [Prepare network topology with GRE tunnel/template for network onboard] ***
+
+TASK [prepare cisco] ***********************************************************
+changed: [rtr1]
+
+TASK [prepare arista] **********************************************************
+ok: [rtr2]
 ~~~
 ### Step 2 - Network-Config-Push Job-Template with an Error
 In this step we will set our "Batch" parameters for the following:

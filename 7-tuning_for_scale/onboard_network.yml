@@ -13,18 +13,6 @@
         msg: "This task just failed"
       when: errors == 'yes'
 
-    - name: Configure bgp_address_family
-      cisco.ios.ios_bgp_address_family:
-        config: "{{ bgp_address_family | default (omit, True) }}"
-        state: merged
-      when: inventory_hostname in groups['cisco']
-
-    - name: Configure bgp_address_family
-      arista.eos.eos_bgp_address_family:
-        config: "{{ bgp_address_family | default (omit, True) }}"
-        state: merged
-      when: inventory_hostname == 'rtr2'
-
     - name: Configure interfaces
       cisco.ios.ios_interfaces:
         config: "{{ interfaces | default (omit, True) }}"
@@ -42,6 +30,18 @@
         config: "{{ interfaces | default (omit, True) }}"
         state: merged
       when: inventory_hostname in groups['juniper']
+
+    - name: Configure bgp_address_family
+      cisco.ios.ios_bgp_address_family:
+        config: "{{ bgp_address_family | default (omit, True) }}"
+        state: merged
+      when: inventory_hostname in groups['cisco']
+
+    - name: Configure bgp_address_family
+      arista.eos.eos_bgp_address_family:
+        config: "{{ bgp_address_family | default (omit, True) }}"
+        state: merged
+      when: inventory_hostname == 'rtr2'  
 
 - name: Prepare network topology with GRE tunnel/template for network onboard
   hosts: routers
