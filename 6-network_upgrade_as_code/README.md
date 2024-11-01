@@ -48,7 +48,7 @@ gdown https://drive.google.com/uc?id=1cPPO1mxIZf4weIi497r3ffGC5g0_S58i
 2. Push to gitea repo
 This way the image files will be available for Ansible. Normally we would store these image files on a server instead of the git repo.
 Complete the git steps for your change. You must save, commit the file in the VSCode IDE and "sync" push to gitea after fixing the file.
-![Save](../../images/save_commit.png)
+![Save](../images/save_commit.png)
 
 or update from the terminal
 ~~~
@@ -112,7 +112,7 @@ mv c8000v-universalk9.17.15.01a.SPA.bin /home/student
 2. Push to gitea repo
 This way the image files will no longer be in the repo.
 Complete the git steps for your change. You must save, commit the file in the VSCode IDE and "sync" push to gitea after fixing the file.
-![Save](../../images/save_commit.png)
+![Save](../images/save_commit.png)
 
 or update from the terminal
 ~~~
