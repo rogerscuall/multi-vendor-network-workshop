@@ -15,9 +15,7 @@
     - l3_interfaces
     - bfd_interfaces
     - lldp_global
-    - lldp_interfaces
-    - ospf_interfaces
-    - telemetry
+   
 
   tasks:
     
