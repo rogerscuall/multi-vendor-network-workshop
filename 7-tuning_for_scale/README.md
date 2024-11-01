@@ -132,7 +132,7 @@ rtr2                       : ok=0    changed=0    unreachable=0    failed=1    s
 ~~~
 
 # Key Takeaways
-* tuning your playbooks offers guardrails for rolling updates and* configurations into production environments
+* tuning your playbooks offers guardrails for rolling updates and configurations into production environments
 * serial offers the ability to organize inventory hosts into batches
 * max_failure_percentage limits the blast radius of errored playbooks
 
