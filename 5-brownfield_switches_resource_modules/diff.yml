@@ -14,8 +14,6 @@
     - l2_interfaces
     - l3_interfaces
     - bfd_interfaces
-    - lldp_global
-   
 
   tasks:
     
