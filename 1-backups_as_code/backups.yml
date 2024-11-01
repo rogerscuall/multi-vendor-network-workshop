@@ -73,7 +73,7 @@
         organization: "Red Hat network organization"
         inventory: "Workshop Inventory"
         project: "Student Project"
-        playbook: "network_backups_git/intended.yml"
+        playbook: "1-backups_as_code/intended.yml"
         credentials:
           - "Workshop Credential"
         execution_environment: "Validated Network"
@@ -130,7 +130,7 @@
         organization: "Red Hat network organization"
         inventory: "Workshop Inventory"
         project: "Student Project"
-        playbook: "network_backups_git/restore.yml"
+        playbook: "1-backups_as_code/restore.yml"
         credentials:
           - "Workshop Credential"
         execution_environment: "Validated Network"
