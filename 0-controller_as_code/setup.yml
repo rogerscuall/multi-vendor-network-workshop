@@ -112,12 +112,12 @@
           name: ""
           description: ""
           spec:
-            - question_name: Would you like to add a custom branch name or ignore for the default?
+            - question_name: Enter your custom branch name
               type: text
               max: 1024
               min: 0
               variable: branch_name
-              required: false
+              required: true
               default: ""
             - question_name: Which Group or Groups to Backup Configurations
               type: multiselect
