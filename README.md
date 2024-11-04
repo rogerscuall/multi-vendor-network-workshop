@@ -42,7 +42,7 @@ For the below demos ensure you are always using files from /home/student/network
 - [2-Network Compliance Dashboard](2-network_compliance_dashboard/README.md)
 - [3-Network Compliance Checks Remediations](3-network_compliance_checks_remediations/README.md)
 - [4-Multivendor Validated Content (BGP)](4-multi_vendor_validated_content_bgp/README.md)
-- [5-Brownfield Switches Resource Modules](5-brownfield_switches_resource-modules/README.md)
+- [5-Brownfield Switches Resource Modules](5-brownfield_switches_resource_modules/README.md)
 - [6-Network Upgrade As Code](6-network_upgrade_as_code/README.md)
 - [7-Tuning For Scale](7-tuning_for_scale/README.md)
 - [8-Config Drift Restore](8-config_drift_restore)
