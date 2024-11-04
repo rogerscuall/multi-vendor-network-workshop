@@ -38,7 +38,7 @@ pip install gdown
 ~~~
 
 ### Step 2 - Download Images
-From the folder `6-network_upgrade_as_code/`
+In this step you need to change directories. Run the the following commands from the folder `6-network_upgrade_as_code/`
 
 1. gdown
 ~~~
