@@ -24,7 +24,8 @@ NXAPI: 443
 ## Steps
 
 ### Step 1 - Run the Job-template network_brownfield_resource_modules 
-This will run the brownfield.yml playbook to collect configurations as a YAML file.
+- In this step launch the job template `network_brownfield_resource_module`
+* This will run the brownfield.yml playbook to collect configurations as a YAML file.
 
 ### Step 2 - Inspect your new host_vars
 From the VSCode terminal 
