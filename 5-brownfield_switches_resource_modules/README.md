@@ -86,7 +86,8 @@ Run the Job-template `network_brownfield_diff` Job template for the diff.yml pla
 truncated
 
 ### Step 5 - Run the network_brownfield_deploy Job-template 
-This will run the deploy.yml playbook to add the change in `run mode`.
+- In this step launch the job template network_brownfield_deploy Job-template
+* This will run the deploy.yml playbook to add the change in `run mode`.
 
 ### Step 6 - Check Ports 
 * In this exercise we identify interfaces/l2_interfaces that match specific configurations. This demo uses network resource module facts and selectattr filters.
