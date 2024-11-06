@@ -7,7 +7,7 @@ This needs to be completed
 2. Uncomment the appropriate configurations to make a change.
 3. Run the Network-Config-Push-Workflow
 4. Review outputs
-5. Optional run [text](../scoped_configuration_management) persist to discover YAML configs
+5. Add errors
 
 # Exercise-7 Tuning for Scale
 
@@ -17,16 +17,19 @@ This needs to be completed
 - [Step 3 - Network-Config-Push Job-Template with an Error](#step-3---network-config-push-job-template-with-an-error)
 
 ## Objective
-To demonstrate how to push a configuration to a Cisco router that is joining an existing tunnel based topology. The YAML host_var configuration files are provide for you. See step 5 to learn how to collect the configurations from a brownfield device.
+To demonstrate how to push a configuration with in batches to routers.
 
 ## Overview
-In this demo we will use resource modules , jinja2 templates and YAML configuration files to automate introducing a Cisco router into an existing multi-vendor topology. The playbook orchestration is managed with self service surveys and an Ansible AAP workflow.
+In this demo we will use resource modules , jinja2 templates and YAML configuration files along with techniques to update devices at scale.
 
 ## Main Points
 
-* strategy: linear runs playbooks one task at a time. others options include (free, debug)
+* strategy: `linear` to run playbooks one task at a time. others options include (free, debug)
+
 * forks: the number of concurrent hosts ran per task. Default == 5 
+
 * serial: set a batch of hosts using a number, a percentage, or a list of numbers of hosts you want to manage at a time. Serial is used for rolling updates.
+
 * max_fail_percentage: setting applies to each batch when you use it with serial. If more than the set max_fail_percentage for any batch of endpoints failed, the rest of the play would be aborted.
 
 ### Step 1 - Network-Config-Push Job-Template with No Error
