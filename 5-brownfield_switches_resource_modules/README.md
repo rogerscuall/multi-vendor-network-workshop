@@ -95,8 +95,10 @@ truncated
 #### Main Points
 Examine the `5-brownfield_switches_resource_modules/checkports.yml playbook
 
-* gather_network_resources: Possible values for this argument include all and the resources like interfaces, vlans etc. Can specify a list of values to include a larger subset. In this exercise we use  ‘interfaces’,and ‘l2_interfaces’.
+* gather_network_resources: Possible values for this argument include `all` and the resources like `interfaces`, `vlans` etc. Can specify a list of values to include a larger subset. In this exercise we use  `interfaces`,and `l2_interfaces`.
+
 * selectattr: filters a sequence of objects based on attributes of the objects in the list.
+
 * map: applies a filter on a sequence of objects or to look up an attribute. This is useful when you have lists of objects but you are interested in only a certain value.
 
 
@@ -222,9 +224,9 @@ ok: [nxos] => {
 }
 ~~~
 # Key Takeaways
-* Ansible makes it easy to gather and save configs a YAML files in host_vars.
-* Ansible makes it easy to make changes on brownfield devices.
-* It's easy to locate configurations on devices by using network_resource_modules and filters for selecattr and map.
+* Ansible makes it easy to gather and save router configurations as into the host_vars directory as YAML files .
+* Ansible makes it easy to make automated changes to brownfield devices.
+* It's easy to locate configurations on devices by using network_resource_modules with filters such as selecattr and map.
 
 ## Return to Exercise Menu
  - [Menu of Exercises](../README.md)
