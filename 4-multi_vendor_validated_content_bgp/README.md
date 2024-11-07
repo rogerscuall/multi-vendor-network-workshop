@@ -146,6 +146,8 @@ In the above output we can glean that rtr2 needs `redistribute connected` added 
 2. SSH to rtr2 and fix OSPF
 ~~~
 ssh rtr2
+~~~
+en
 conf t
 router ospf 1
 redistribute connected
