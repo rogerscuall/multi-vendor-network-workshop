@@ -135,7 +135,7 @@ Click on the files icon in the upper right corner of your Visual Studio Code win
 In the pop-up window, choose the `/home/student/network-demos-repo` folder, and select `OK`.
 
 ## Step 5: Controller as Code
-1. If not already there, ensure there is a terminal window open to the `network-demos-repo/0-controller_as_code` directory 
+1. If not already there, ensure there is a terminal window open to the `network-demos-repo` directory 
 
 1. Open a new CLI terminal
 
