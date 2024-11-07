@@ -61,7 +61,7 @@ This time the restore.yml playbook is configured to push the config backup files
 SSH to rtr1 and optionally rtr2-4 to validate the configurations changed back to the original.
 
 ### Optional
-If desired you could also restore to the `final_config` by rerunning this exercise.
+If desired, you could also restore to the `final_config` by rerunning this exercise.
 
 
 # Key Takeaways
