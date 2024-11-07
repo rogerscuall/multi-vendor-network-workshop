@@ -13,7 +13,7 @@
 In this exercise we will compare and restore our changes made since Exercise-1, versus the backup file(s) saved from each router in the Gitea repository. By using the saved router configurations from the `initial_config` branch we can detect that the router configuration has drifted away from our single source of truth as understood by Ansible.
 
 ### Step 1 - Create another backup
-Return to Exercise 1 and rerun the 'Network-Backups-Git' job template. The survey will prompt for optionally naming your branch or inserts default branch naming when ignored. For this exercise, when prompted, name your backup branch `final_config`
+Return to Exercise 1 and rerun the `Network-Backups-Git` job template. The survey will prompt for optionally naming your branch or inserts default branch naming when ignored. For this exercise, when prompted, name your backup branch `final_config`
 
 ### Step 2 - Launch the Network-Intended Job-template
 Upon launching the job-template the self service survey will prompt for information.
