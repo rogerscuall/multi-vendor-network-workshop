@@ -1,0 +1,10 @@
+all:
+  hosts:
+    S1-CLEAF-02:
+      ansible_host: 10.4.5.73
+      ansible_user: admin
+      ansible_password: {{ lookup('env', 'DEVICE_PASSWORD') }}
+  children:
+    network:
+      hosts:
+        S1-CLEAF-02:
